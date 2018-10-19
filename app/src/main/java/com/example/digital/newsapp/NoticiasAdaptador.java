@@ -20,6 +20,7 @@ import java.util.ArrayList;
 public class NoticiasAdaptador extends RecyclerView.Adapter {
 
     private ArrayList<Noticia> noticias;
+    private NoticiaReceptor noticiaReceptor;
 
     public NoticiasAdaptador(ArrayList<Noticia> noticias) {
         this.noticias = noticias;
@@ -30,13 +31,17 @@ public class NoticiasAdaptador extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         Context context = parent.getContext();
+        noticiaReceptor= (NoticiaReceptor) context;
+
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         View view =layoutInflater.inflate(R.layout.item_layout,parent,false);
 
         MyViewHolder myViewHolder = new MyViewHolder(view);
 
         for(int i=0; i<noticias.size();i++){
-            new GetBitmap(i).execute();
+            if(!noticias.get(i).equals("null")){
+                new GetBitmap(i).execute();
+            }
         }
 
         return myViewHolder;
@@ -57,6 +62,9 @@ public class NoticiasAdaptador extends RecyclerView.Adapter {
         return noticias.size();
     }
 
+    public interface NoticiaReceptor{
+        void recibir(Noticia noticia);
+    }
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
 
@@ -70,16 +78,29 @@ public class NoticiasAdaptador extends RecyclerView.Adapter {
             imageViewFoto = itemView.findViewById(R.id.imageViewFoto);
             textViewTitulo = itemView.findViewById(R.id.textViewTitulo);
             textViewDescripcion = itemView.findViewById(R.id.textViewDescripcion);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Noticia noticia = noticias.get(getAdapterPosition());
+
+                    noticiaReceptor.recibir(noticia);
+
+                }
+            });
         }
 
         public void bind(Noticia noticia){
 
             //new DownloadImageTask(imageViewFoto).execute(noticia.getUrlImagen());
 
-            imageViewFoto.setImageBitmap(noticia.getBitmapImagen());
+            if(!noticia.getUrlImagen().equals("null")) {
+                imageViewFoto.setImageBitmap(noticia.getBitmapImagen());
+            }else{
+                imageViewFoto.setImageResource(R.drawable.news);
+            }
             textViewTitulo.setText(noticia.getTitulo());
-            textViewDescripcion.setText(noticia.getContenido());
-
+            textViewDescripcion.setText(noticia.getDescripcion());
         }
 
     }

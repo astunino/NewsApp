@@ -1,6 +1,7 @@
 package com.example.digital.newsapp;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -16,17 +17,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NoticiasAdaptador.NoticiaReceptor{
 
     private String TAG = MainActivity.class.getSimpleName();
     private ArrayList<Noticia> noticias = new ArrayList<>();
-    private ListView listViewNoticias;
     private RecyclerView recyclerViewNoticias;
-    static final int DURACION = 1 * 1000; // 2 segundos de carga
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,12 +40,30 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void recibir(Noticia noticia) {
+        Bundle bundle = new Bundle();
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        noticia.getBitmapImagen().compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+
+        Bundle b = new Bundle();
+
+        bundle.putString(NoticiaDetalleActivity.KEY_TITULO,noticia.getTitulo());
+        bundle.putString(NoticiaDetalleActivity.KEY_DESCRIPCION,noticia.getDescripcion());
+        bundle.putByteArray(NoticiaDetalleActivity.KEY_IMAGEN,byteArray);
+
+        Intent intent = new Intent(this,NoticiaDetalleActivity.class);
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
     @SuppressLint("StaticFieldLeak")
     private class GetNoticias extends AsyncTask<Void, Void, ArrayList<Noticia>> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            //Toast.makeText(MainActivity.this,"Cargando...",Toast.LENGTH_LONG).show();
 
         }
 
@@ -54,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
             HttpHandler sh = new HttpHandler();
             // Making a request to url and getting responseç
             String url = "https://newsapi.org/v2/top-headlines?country=ar&category=science&apiKey=8b141017cf6848908829489044ed6f71";
+            //String url = "https://newsapi.org/v2/everything?q=cyber&apiKey=8b141017cf6848908829489044ed6f71";
             String jsonStr = sh.makeServiceCall(url);
 
             Log.e(TAG, "Response from url: " + jsonStr);
@@ -73,6 +92,9 @@ public class MainActivity extends AppCompatActivity {
                         String descripcion = e.getString("description");
                         String urlNoticia = e.getString("url");
                         String urlImage = e.getString("urlToImage");
+                        if(urlImage.startsWith("//")){
+                            urlImage = "http:"+urlImage;
+                        }
                         String publicado = e.getString("publishedAt");
                         String contenido = e.getString("content");
 
@@ -115,12 +137,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void traerDatos(){
 
-        ArrayList<String> titulos = new ArrayList<>();
-
-        for(int i=0;i<noticias.size(); i++){
-            titulos.add(noticias.get(i).getTitulo());
-        }
-
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
 
         recyclerViewNoticias.setHasFixedSize(true);
@@ -129,7 +145,5 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewNoticias.setAdapter(adaptador);
         recyclerViewNoticias.setLayoutManager(layoutManager);
     }
-
-
 
 }
