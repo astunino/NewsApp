@@ -1,5 +1,7 @@
 package com.example.digital.newsapp;
 
+import android.graphics.Bitmap;
+
 public class Noticia {
 
     private String autor;
@@ -9,6 +11,7 @@ public class Noticia {
     private String urlImagen;
     private String publicado;
     private String contenido;
+    private Bitmap bitmapImagen;
 
     public Noticia(String autor, String titulo, String descripcion, String url, String urlImagen, String publicado, String contenido) {
         this.autor = autor;
@@ -18,6 +21,25 @@ public class Noticia {
         this.urlImagen = urlImagen;
         this.publicado = publicado;
         this.contenido = contenido;
+    }
+
+    public Noticia(String autor, String titulo, String descripcion, String url, String urlImagen, String publicado, String contenido, Bitmap bitmapImagen) {
+        this.autor = autor;
+        this.titulo = titulo;
+        this.descripcion = descripcion;
+        this.url = url;
+        this.urlImagen = urlImagen;
+        this.publicado = publicado;
+        this.contenido = contenido;
+        this.bitmapImagen = bitmapImagen;
+    }
+
+    public Bitmap getBitmapImagen() {
+        return bitmapImagen;
+    }
+
+    public void setBitmapImagen(Bitmap bitmapImagen) {
+        this.bitmapImagen = bitmapImagen;
     }
 
     public String getAutor() {

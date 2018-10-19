@@ -12,7 +12,7 @@
         <ImageView
             android:id="@+id/imageViewFoto"
             android:layout_width="0dp"
-            android:layout_height="100dp"
+            android:layout_height="150dp"
             android:scaleType="fitCenter"
             android:layout_weight="25"/>
 

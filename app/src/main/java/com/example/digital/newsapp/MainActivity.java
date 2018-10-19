@@ -1,13 +1,14 @@
 package com.example.digital.newsapp;
 
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -15,6 +16,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,13 +26,13 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Noticia> noticias = new ArrayList<>();
     private ListView listViewNoticias;
     private RecyclerView recyclerViewNoticias;
+    static final int DURACION = 1 * 1000; // 2 segundos de carga
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //listViewNoticias = findViewById(R.id.listViewNoticias);
         recyclerViewNoticias = findViewById(R.id.recyclerViewNoticias);
 
         new GetNoticias().execute();
@@ -63,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                     JSONArray noticiasJSON = jsonObj.getJSONArray("articles");
 
                     // looping through All Entidades
-                    for (int i = 0; i < noticiasJSON.length(); i++) {
+                    for (Integer i = 0; i < noticiasJSON.length(); i++) {
                         JSONObject e = noticiasJSON.getJSONObject(i);
                         String autor = e.getString("author");
                         String titulo = e.getString("title");
@@ -120,10 +123,13 @@ public class MainActivity extends AppCompatActivity {
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
 
+        recyclerViewNoticias.setHasFixedSize(true);
 
         NoticiasAdaptador adaptador = new NoticiasAdaptador(noticias);
         recyclerViewNoticias.setAdapter(adaptador);
         recyclerViewNoticias.setLayoutManager(layoutManager);
     }
+
+
 
 }
